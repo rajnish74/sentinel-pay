@@ -1,0 +1,71 @@
+# ============ JAVA / MAVEN ============
+*.class
+*.jar
+*.war
+*.ear
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties
+
+# ============ IDE ============
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+*.swp
+*.swo
+
+# ============ NODE / FRONTEND ============
+node_modules/
+dist/
+build/
+.next/
+.vite/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+.env.local
+.env.*.local
+
+# ============ PYTHON (ML service) ============
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+*.pkl
+*.joblib
+
+# ============ ENVIRONMENT / SECRETS ============
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ============ OS ============
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============ LOGS ============
+logs/
+*.log
+
+# ============ DOCKER ============
+.docker/

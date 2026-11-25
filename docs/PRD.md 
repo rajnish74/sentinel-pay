@@ -1,0 +1,234 @@
+
+---
+
+```markdown
+# SentinelPay — Product Requirements Document (PRD)
+
+**Version:** 1.0
+**Status:** Active
+**Last Updated:** 2026-11-25
+**Owner:** [Rajnish Kumar]
+**Tagline:** Secure Payments, Intelligent Protection
+
+---
+
+## 1. Vision
+
+Build a production-grade payment infrastructure platform that demonstrates
+real-world fintech engineering: safe money movement (double-entry ledger),
+zero double-charges (idempotency), real-time fraud detection (ML), and
+merchant settlement/reconciliation.
+
+**Not an e-commerce app.** A **payment platform** that other businesses could
+theoretically integrate with.
+
+---
+
+## 2. Success Criteria
+
+By end of Phase 3, SentinelPay must:
+
+- Process 1000 TPS in load tests (k6) with <200ms p95 latency
+- Demonstrate **zero money loss** under concurrent transaction stress tests
+- Fraud model achieve >90% precision on simulated dataset
+- Be fully deployed, monitored (Grafana), and CI/CD automated
+- Have complete API docs (Swagger) + Postman collection
+
+---
+
+## 3. Roles (8 Total)
+
+| # | Role | Scope |
+|---|------|-------|
+| 1 | Super Admin | Platform-wide control |
+| 2 | Operations Admin | Settlement, reconciliation, disputes |
+| 3 | Fraud Analyst | Risk queue, rules, blocklists |
+| 4 | Merchant Admin | Manage their merchant account |
+| 5 | Merchant Developer | API keys, webhooks, sandbox |
+| 6 | Merchant Finance | Settlements, refunds, reports |
+| 7 | Merchant Support | Read-only transaction lookup |
+| 8 | Customer | Pay, history, disputes |
+
+**Phase 1 builds roles:** Super Admin, Merchant Admin, Customer
+
+---
+
+## 4. Feature Modules
+
+### Module 1 — Core Payment Engine ⭐ (Phase 1)
+- Payment Initiation API
+- Idempotency key handling
+- Payment State Machine (INITIATED → CAPTURED → SETTLED)
+- Double-Entry Ledger
+- Capture vs Authorize
+- Partial Capture
+- Concurrency control (pessimistic/optimistic locking)
+
+### Module 2 — Payment Methods (Phase 1 partial, Phase 2 full)
+- Card (simulated, tokenized)
+- UPI (simulated)
+- Wallet (internal)
+- Net Banking (simulated)
+- Payment method routing
+
+### Module 3 — Merchant Management (Phase 1 basic)
+- Merchant onboarding
+- API key management
+- Merchant settings
+- Phase 3: KYC, hierarchy, limits
+
+### Module 4 — Fraud Detection & Risk (Phase 2) ⭐
+- Rule-based engine (configurable from UI)
+- Velocity checks (Redis)
+- Device fingerprinting
+- ML risk score (XGBoost)
+- Anomaly detection (Isolation Forest)
+- Manual review queue
+- Blocklist/Allowlist
+- Feedback loop for retraining
+
+### Module 5 — Refunds, Disputes (Phase 2)
+- Full/Partial refund
+- Refund reason codes
+- Dispute lifecycle
+- Chargeback simulation
+
+### Module 6 — Settlement & Reconciliation (Phase 3)
+- Settlement cycle engine
+- Fee calculation
+- Rolling reserve
+- Reconciliation engine
+- Payout API
+
+### Module 7 — Developer Experience (Phase 2)
+- REST API + Swagger
+- API versioning
+- Webhooks + retry + signature
+- Sandbox mode
+- Rate limiting
+- API logs
+
+### Module 8 — Notifications (Phase 3)
+- Email, SMS, in-app
+- Templates
+- Preferences
+
+### Module 9 — Analytics & Reporting (Phase 2 basic, Phase 3 full)
+- Transaction analytics
+- Fraud analytics
+- Settlement analytics
+- System health metrics
+- Custom reports
+
+### Module 10 — Security & Compliance (Continuous)
+- JWT + refresh tokens ⭐ Phase 1
+- RBAC with fine-grained permissions ⭐ Phase 1
+- HMAC request signing
+- Replay attack prevention
+- Hash-chained audit log
+- PII encryption
+- Tokenization
+- Circuit breaker (Resilience4j)
+
+---
+
+## 5. Phase Breakdown
+
+### 🟢 Phase 1: Foundation (Months 1–6)
+
+**Modules:** 1, 2 (Card only), 3 (basic), 10 (JWT + RBAC)
+
+**Deliverables:**
+- Working Payment API (initiate, authorize, capture, void)
+- Double-entry ledger with ACID guarantees
+- Idempotency fully working
+- Merchant signup/login/API keys
+- JWT auth with RBAC
+- 8-10 frontend pages
+- Docker Compose local setup
+- Unit + integration tests
+
+**Exit Criteria:**
+- 100 concurrent payments processed correctly (no double-charge)
+- Ledger balance = sum of entries (invariant test passes)
+- Full Swagger docs
+- Deployed to Render/Railway
+
+### 🟡 Phase 2: Intelligence (Months 7–14)
+
+**Modules:** 4, 5, 7, 9 (basic), 2 (full)
+
+**Deliverables:**
+- ML fraud scoring microservice
+- Webhooks with retry + HMAC signature
+- Refunds & disputes
+- Merchant dashboard analytics
+- Sandbox mode
+- 25+ frontend pages
+
+**Exit Criteria:**
+- Fraud score returned in <100ms p95
+- Webhook delivery success rate >99% (with retries)
+- >90% fraud model precision on test set
+
+### 🔴 Phase 3: Production (Months 15–24)
+
+**Modules:** 6, 8, 9 (full), 10 (advanced)
+
+**Deliverables:**
+- Settlement + reconciliation engine
+- Notifications (email/SMS)
+- Full observability (Prometheus + Grafana)
+- Kafka event-driven architecture
+- Transactional Outbox pattern
+- Complete CI/CD
+- 45+ frontend pages
+
+**Exit Criteria:**
+- 1000 TPS load test passing
+- Uptime >99.9% in 30-day monitoring window
+- Full audit trail for every action
+
+---
+
+## 6. Non-Functional Requirements
+
+| Category | Requirement |
+|----------|-------------|
+| **Latency** | Payment API p95 <200ms |
+| **Throughput** | 1000 TPS (Phase 3) |
+| **Availability** | 99.9% uptime |
+| **Security** | JWT, RBAC, HMAC, encryption at rest |
+| **Data Integrity** | Double-entry ledger, ACID, idempotent |
+| **Observability** | Prometheus metrics, distributed tracing |
+| **Testing** | Unit tests (80%+ coverage), Testcontainers integration tests |
+
+---
+
+## 7. Out of Scope (v1)
+
+- Real PCI-DSS certification
+- Actual bank integrations
+- Mobile apps
+- Multi-currency (start with INR only)
+- Cryptocurrency payments
+- Physical card issuance
+
+---
+
+## 8. Design Language
+
+- **Primary:** #635BFF (purple — trust, modern)
+- **Background:** #F7F9FC
+- **Sidebar:** #0A2540 (dark navy)
+- **Font:** Inter (headings + body), JetBrains Mono (code/numbers)
+- **UI Library:** shadcn/ui + Tailwind CSS
+- **Inspiration:** Stripe Dashboard, Razorpay Dashboard, Linear
+
+---
+
+## 9. Change Log
+
+| Date | Version | Change |
+|------|---------|--------|
+| 2026-11-25 | 1.0 | Initial PRD created |
