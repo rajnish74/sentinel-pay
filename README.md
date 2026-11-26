@@ -118,7 +118,7 @@ a modular monolith, splitting into services in Phase 2+.
 | **Phase 2** | Months 7–14 | Intelligence | Fraud Engine, Refunds, Webhooks, Analytics |
 | **Phase 3** | Months 15–24 | Production | Settlement, Reconciliation, Observability |
 
-See [docs/PRD.md](./docs/PRD.md) for detailed scope.
+See [docs/PRD.md](./docs/PRD.md%20) for detailed scope.
 
 ---
 
@@ -159,7 +159,7 @@ Once running:
 
 ## 📚 Documentation
 
-- [Product Requirements (PRD)](./docs/PRD.md)
+- [Product Requirements (PRD)](./docs/PRD.md%20)
 - [Architecture Decisions](./docs/decisions/)
 - API Contracts — coming in Feature 1.1
 - Database Schema — coming in Feature 1.1
