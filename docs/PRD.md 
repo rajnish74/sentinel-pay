@@ -1,26 +1,18 @@
-
----
-
-```markdown
 # SentinelPay — Product Requirements Document (PRD)
 
-**Version:** 1.0
-**Status:** Active
-**Last Updated:** 2026-11-25
-**Owner:** [Rajnish Kumar]
-**Tagline:** Secure Payments, Intelligent Protection
+- **Version:** 1.0
+- **Status:** Active
+- **Last Updated:** 2026-11-25
+- **Owner:** Rajnish Kumar
+- **Tagline:** Secure Payments, Intelligent Protection
 
 ---
 
 ## 1. Vision
 
-Build a production-grade payment infrastructure platform that demonstrates
-real-world fintech engineering: safe money movement (double-entry ledger),
-zero double-charges (idempotency), real-time fraud detection (ML), and
-merchant settlement/reconciliation.
+Build a production-grade payment infrastructure platform that demonstrates real-world fintech engineering: safe money movement (double-entry ledger), zero double-charges (idempotency), real-time fraud detection (ML), and merchant settlement/reconciliation.
 
-**Not an e-commerce app.** A **payment platform** that other businesses could
-theoretically integrate with.
+**Not an e-commerce app.** A **payment platform** that other businesses could theoretically integrate with.
 
 ---
 
@@ -58,7 +50,7 @@ By end of Phase 3, SentinelPay must:
 ### Module 1 — Core Payment Engine ⭐ (Phase 1)
 - Payment Initiation API
 - Idempotency key handling
-- Payment State Machine (INITIATED → CAPTURED → SETTLED)
+- Payment State Machine (`INITIATED` → `CAPTURED` → `SETTLED`)
 - Double-Entry Ledger
 - Capture vs Authorize
 - Partial Capture
@@ -144,7 +136,7 @@ By end of Phase 3, SentinelPay must:
 - Idempotency fully working
 - Merchant signup/login/API keys
 - JWT auth with RBAC
-- 8-10 frontend pages
+- 8–10 frontend pages
 - Docker Compose local setup
 - Unit + integration tests
 
@@ -218,9 +210,9 @@ By end of Phase 3, SentinelPay must:
 
 ## 8. Design Language
 
-- **Primary:** #635BFF (purple — trust, modern)
-- **Background:** #F7F9FC
-- **Sidebar:** #0A2540 (dark navy)
+- **Primary:** `#635BFF` (purple — trust, modern)
+- **Background:** `#F7F9FC`
+- **Sidebar:** `#0A2540` (dark navy)
 - **Font:** Inter (headings + body), JetBrains Mono (code/numbers)
 - **UI Library:** shadcn/ui + Tailwind CSS
 - **Inspiration:** Stripe Dashboard, Razorpay Dashboard, Linear
