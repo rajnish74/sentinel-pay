@@ -1,0 +1,63 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: sentinelpay-backend
+
+  # JPA / Hibernate config
+  jpa:
+    hibernate:
+      # NOTE: validate use kar rahe hain, update NAHI
+      # Kyun? Kyunki Flyway schema manage karega, Hibernate sirf verify karega
+      # update use kiya toh Hibernate apni marzi se tables banayega aur
+      # Flyway ke saath conflict hoga. Yeh maine pehle galat kiya tha.
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC           # IMPORTANT - payments mein time zone critical hai
+    open-in-view: false            # anti-pattern
+
+  # Flyway migrations
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  # Redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# Server
+server:
+  port: 8080
+  error:
+    include-message: always
+
+# Swagger
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# App-specific custom properties (baad mein use karenge)
+sentinelpay:
+  api:
+    version: v1
+  idempotency:
+    ttl-hours: 24

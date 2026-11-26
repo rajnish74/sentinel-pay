@@ -1,0 +1,51 @@
+# SentinelPay - Local dev infrastructure
+# Run: docker-compose up -d
+# Stop: docker-compose down
+# Complete data delete: docker-compose down -v
+
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: sentinelpay-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sentinelpay_db
+      POSTGRES_USER: sentinelpay
+      POSTGRES_PASSWORD: sentinelpay_dev_pass   # local dev only, prod mein secrets use karenge
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # NOTE: spring boot start hone se pehle db ready hona chahiye
+      # warna connection refused error aata hai (maine yeh 2 baar face kiya)
+      test: ["CMD-SHELL", "pg_isready -U sentinelpay -d sentinelpay_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis - cache, rate limiting, velocity checks ke liye
+
+  redis:
+    image: redis:7-alpine
+    container_name: sentinelpay-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
