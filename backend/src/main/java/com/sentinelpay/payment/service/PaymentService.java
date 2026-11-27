@@ -1,6 +1,7 @@
 package com.sentinelpay.payment.service;
 
 import com.sentinelpay.common.exception.ResourceNotFoundException;
+import com.sentinelpay.ledger.service.LedgerService;
 import com.sentinelpay.merchant.entity.Merchant;
 import com.sentinelpay.merchant.repository.MerchantRepository;
 import com.sentinelpay.payment.dto.PaymentInitiateRequest;
@@ -24,6 +25,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final MerchantRepository merchantRepository;
     private final PaymentMapper paymentMapper;
+    private final LedgerService ledgerService;
 
     @Transactional
     public PaymentResponse initiatePayment(UUID merchantId, String idempotencyKey, PaymentInitiateRequest request){
@@ -50,6 +52,25 @@ public class PaymentService {
 
         return paymentMapper.toResponse(savedPayment);
 
+    }
+
+    @Transactional
+    public PaymentResponse capturePayment(UUID paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Payment", paymentId));
+
+        if (payment.getStatus() != PaymentStatus.INITIATED) {
+            throw new IllegalStateException("Only INITIATED payments can be captured");
+        }
+
+        // 1. Change Status
+        payment.setStatus(PaymentStatus.CAPTURED);
+        Payment savedPayment = paymentRepository.save(payment);
+
+        // 2. Record Ledger Entries
+        ledgerService.recordPaymentCapture(savedPayment);
+
+        return paymentMapper.toResponse(savedPayment);
     }
 
 

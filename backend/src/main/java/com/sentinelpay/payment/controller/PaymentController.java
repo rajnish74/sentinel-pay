@@ -37,4 +37,11 @@ public class PaymentController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PostMapping("/{paymentId}/capture")
+    @Operation(summary = "Capture a payment (triggers ledger entries)")
+    public ResponseEntity<PaymentResponse> capturePayment(@PathVariable UUID paymentId) {
+        PaymentResponse response = paymentService.capturePayment(paymentId);
+        return ResponseEntity.ok(response);
+    }
 }
