@@ -120,6 +120,14 @@ a modular monolith, splitting into services in Phase 2+.
 
 See [docs/PRD.md](./docs/PRD.md) for detailed scope.
 
+### 📈 Current Progress (Phase 1)
+
+- [x] Initial Setup (Docker, Spring Boot, Flyway)
+- [x] Merchant Module (Entity, API, Validation)
+- [x] API Key Generation (Bcrypt hashing)
+- [x] Core Payment API (Idempotency implemented)
+- [ ] Double-Entry Ledger (In Progress)
+
 ---
 
 ## 🚦 Getting Started
