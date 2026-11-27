@@ -17,6 +17,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -102,5 +103,44 @@ class MerchantApiIntegrationTest {
 
         mockMvc.perform(get("/api/v1/merchants/{id}", savedMerchant.getId()))
             .andExpect(status().isNotFound());
+    }
+
+
+    @Test
+    void createMerchant_withValidData_returns201() throws Exception {
+        String requestBody = """
+            {
+              "businessName": "New Merchant",
+              "businessEmail": "new@example.com",
+              "businessPhone": "+919999999999",
+              "panNumber": "ABCDE1234F"
+            }
+            """;
+
+        mockMvc.perform(post("/api/v1/merchants")
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").exists())
+            .andExpect(jsonPath("$.businessEmail").value("new@example.com"))
+            .andExpect(jsonPath("$.status").value("PENDING"));
+    }
+
+    @Test
+    void createMerchant_withInvalidData_returns400() throws Exception {
+        String requestBody = """
+            {
+              "businessName": "",
+              "businessEmail": "invalid-email",
+              "businessPhone": "123"
+            }
+            """;
+
+        mockMvc.perform(post("/api/v1/merchants")
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errorCode").value("VALIDATION_FAILED"))
+            .andExpect(jsonPath("$.fieldErrors.businessEmail").exists());
     }
 }
