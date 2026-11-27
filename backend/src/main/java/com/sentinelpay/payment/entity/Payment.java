@@ -28,6 +28,9 @@ public class Payment extends BaseEntity {
     @Column(nullable = false, length = 20)
     private PaymentStatus status;
 
+    @Column(name = "refunded_amount", nullable = false)
+    private Long refundedAmount = 0L;
+
     @Column(name = "idempotency_key", nullable = false, length = 100)
     private String idempotencyKey;
 

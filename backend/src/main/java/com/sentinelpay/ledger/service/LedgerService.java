@@ -73,4 +73,25 @@ public class LedgerService {
                 return accountRepository.save(acc);
             });
     }
+
+    @Transactional
+    public void recordPaymentRefund(Payment payment, Long refundAmount) {
+        LedgerAccount merchantAccount = getOrCreateMerchantAccount(payment.getMerchant());
+        LedgerAccount escrowAccount = getOrCreatePlatformAccount(AccountType.CUSTOMER_ESCROW);
+
+        LedgerEntry debitEntry = new LedgerEntry();
+        debitEntry.setAccount(escrowAccount);
+        debitEntry.setPayment(payment);
+        debitEntry.setEntryType(EntryType.DEBIT);
+        debitEntry.setAmount(refundAmount);
+
+        LedgerEntry creditEntry = new LedgerEntry();
+        creditEntry.setAccount(merchantAccount);
+        creditEntry.setPayment(payment);
+        creditEntry.setEntryType(EntryType.CREDIT);
+        creditEntry.setAmount(refundAmount);
+
+        entryRepository.save(debitEntry);
+        entryRepository.save(creditEntry);
+    }
 }
