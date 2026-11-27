@@ -55,19 +55,21 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentResponse capturePayment(UUID paymentId) {
+    public PaymentResponse capturePayment(UUID merchantId, UUID paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
             .orElseThrow(() -> new ResourceNotFoundException("Payment", paymentId));
+
+        if (!payment.getMerchant().getId().equals(merchantId)) {
+            throw new ResourceNotFoundException("Payment", paymentId);
+        }
 
         if (payment.getStatus() != PaymentStatus.INITIATED) {
             throw new IllegalStateException("Only INITIATED payments can be captured");
         }
 
-        // 1. Change Status
         payment.setStatus(PaymentStatus.CAPTURED);
         Payment savedPayment = paymentRepository.save(payment);
 
-        // 2. Record Ledger Entries
         ledgerService.recordPaymentCapture(savedPayment);
 
         return paymentMapper.toResponse(savedPayment);

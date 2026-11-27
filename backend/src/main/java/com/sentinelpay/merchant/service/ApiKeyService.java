@@ -52,6 +52,7 @@ public class ApiKeyService {
 //        save to db
         MerchantApiKey apiKey = new MerchantApiKey();
         apiKey.setMerchant(merchant);
+        apiKey.setActive(true);
         apiKey.setKeyId(keyId);
         apiKey.setKeyPrefix(keyPrefix);
         apiKey.setKeySecretHash(secretHash);
@@ -59,11 +60,14 @@ public class ApiKeyService {
 
         MerchantApiKey savedKey = merchantApiKeyRepository.save(apiKey);
 
+        // Return format: keyId.rawSecret (e.g., key_abc123.dGhpcyBpcyBh)
+        String fullApiKey = savedKey.getKeyId() + "." + rawSecret;
+
         //  Return response with RAW secret (only time we do this)
         return new ApiKeyCreateResponse(
             savedKey.getId(),
             savedKey.getKeyId(),
-            rawSecret,
+            fullApiKey,
             savedKey.getKeyPrefix(),
             savedKey.getEnvironment(),
             savedKey.getCreatedAt()

@@ -38,7 +38,7 @@ public class MerchantApiKey extends BaseEntity {
     private String environment;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive;
+    private boolean isActive = true;
 
     @Column(name = "last_used_at")
     private Instant lastUsedAt;

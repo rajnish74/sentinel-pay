@@ -9,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.naming.AuthenticationException;
+import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,5 +76,29 @@ public class GlobalExceptionHandler {
             Instant.now()
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(
+        AccessDeniedException ex, HttpServletRequest request) {
+        ErrorResponse error = new ErrorResponse(
+            "ACCESS_DENIED",
+            "You are not authorized to access this resource.",
+            request.getRequestURI(),
+            Instant.now()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+        AuthenticationException ex, HttpServletRequest request) {
+        ErrorResponse error = new ErrorResponse(
+            "UNAUTHORIZED",
+            "Invalid or missing API Key.",
+            request.getRequestURI(),
+            Instant.now()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 }

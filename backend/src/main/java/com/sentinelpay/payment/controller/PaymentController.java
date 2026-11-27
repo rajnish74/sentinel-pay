@@ -1,5 +1,6 @@
 package com.sentinelpay.payment.controller;
 
+import com.sentinelpay.merchant.entity.Merchant;
 import com.sentinelpay.payment.dto.PaymentInitiateRequest;
 import com.sentinelpay.payment.dto.PaymentResponse;
 import com.sentinelpay.payment.service.PaymentService;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -23,25 +25,22 @@ public class PaymentController {
     @PostMapping
     @Operation(summary = "Initiate a new payment")
     public ResponseEntity<PaymentResponse> initiatePayment(
-        // In reality, merchantId would come from the API Key authentication context.
-        // For now, we pass it as a header for testing purposes.
-        @RequestHeader("X-Merchant-Id") UUID merchantId,
-
-        // Mandatory header for idempotency (like Stripe)
-        @Parameter(description = "Unique key to prevent duplicate payments")
+        @AuthenticationPrincipal Merchant merchant,
         @RequestHeader("Idempotency-Key") String idempotencyKey,
-
         @Valid @RequestBody PaymentInitiateRequest request) {
 
-        PaymentResponse response = paymentService.initiatePayment(merchantId, idempotencyKey, request);
+        PaymentResponse response = paymentService.initiatePayment(merchant.getId(), idempotencyKey, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/{paymentId}/capture")
     @Operation(summary = "Capture a payment (triggers ledger entries)")
-    public ResponseEntity<PaymentResponse> capturePayment(@PathVariable UUID paymentId) {
-        PaymentResponse response = paymentService.capturePayment(paymentId);
+    public ResponseEntity<PaymentResponse> capturePayment(
+        @AuthenticationPrincipal Merchant merchant,
+        @PathVariable UUID paymentId) {
+
+        PaymentResponse response = paymentService.capturePayment(merchant.getId(), paymentId);
         return ResponseEntity.ok(response);
     }
 }
