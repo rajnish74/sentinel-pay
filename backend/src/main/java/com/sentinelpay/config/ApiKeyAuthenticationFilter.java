@@ -31,23 +31,21 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer key_")) {
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String fullApiKey = authHeader.substring(7).trim(); // .trim() lagaya hai taaki extra space na ho
-            log.info("Filter triggered. Key received: {}", fullApiKey);
+            String fullApiKey = authHeader.substring(7);
+            log.info("Filter triggered for API Key. Key received: {}", fullApiKey);
 
             String[] parts = fullApiKey.split("\\.");
 
             if (parts.length == 2) {
                 String keyId = parts[0];
                 String rawSecret = parts[1];
-                log.info("Looking up KeyId: {}", keyId);
 
                 Optional<MerchantApiKey> apiKeyOpt = apiKeyRepository.findByKeyIdAndIsActiveTrue(keyId);
 
                 if (apiKeyOpt.isPresent()) {
                     MerchantApiKey apiKey = apiKeyOpt.get();
-                    log.info("Key found in DB. Verifying secret...");
 
                     if (passwordEncoder.matches(rawSecret, apiKey.getKeySecretHash())) {
                         log.info("Secret MATCHED. Setting authentication context.");
