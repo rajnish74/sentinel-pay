@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.UUID;
+
 public record RegisterRequest(
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
@@ -19,5 +21,9 @@ public record RegisterRequest(
     String fullName,
 
     @NotNull(message = "Role is required")
-    UserRole role
+    UserRole role,
+
+    String businessName,
+    String businessPhone,
+    String merchantId
 ) {}

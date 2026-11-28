@@ -1,5 +1,6 @@
 package com.sentinelpay.payment.controller;
 
+import com.sentinelpay.auth.entity.PlatformUser;
 import com.sentinelpay.merchant.entity.Merchant;
 import com.sentinelpay.payment.dto.PaymentInitiateRequest;
 import com.sentinelpay.payment.dto.PaymentResponse;
@@ -29,11 +30,12 @@ public class PaymentController {
     @PostMapping
     @Operation(summary = "Initiate a new payment")
     public ResponseEntity<PaymentResponse> initiatePayment(
-        @AuthenticationPrincipal Merchant merchant,
+        @AuthenticationPrincipal Object principal,
         @RequestHeader("Idempotency-Key") String idempotencyKey,
         @Valid @RequestBody PaymentInitiateRequest request) {
 
-        PaymentResponse response = paymentService.initiatePayment(merchant.getId(), idempotencyKey, request);
+        UUID merchantId = extractMerchantId(principal);
+        PaymentResponse response = paymentService.initiatePayment(merchantId, idempotencyKey, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -41,21 +43,39 @@ public class PaymentController {
     @PostMapping("/{paymentId}/capture")
     @Operation(summary = "Capture a payment (triggers ledger entries)")
     public ResponseEntity<PaymentResponse> capturePayment(
-        @AuthenticationPrincipal Merchant merchant,
+        @AuthenticationPrincipal Object principal,
         @PathVariable UUID paymentId) {
 
-        PaymentResponse response = paymentService.capturePayment(merchant.getId(), paymentId);
+        UUID merchantId = extractMerchantId(principal);
+        PaymentResponse response = paymentService.capturePayment(merchantId, paymentId);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{paymentId}/refunds")
     @Operation(summary = "Refund a payment (full or partial)")
     public ResponseEntity<RefundResponse> refundPayment(
-        @AuthenticationPrincipal Merchant merchant,
+        @AuthenticationPrincipal Object principal,
         @PathVariable UUID paymentId,
         @Valid @RequestBody RefundRequest request) {
 
-        RefundResponse response = refundService.processRefund(merchant.getId(), paymentId, request);
+        UUID merchantId = extractMerchantId(principal);
+
+        RefundResponse response = refundService.processRefund(merchantId, paymentId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+    private UUID extractMerchantId(Object principal) {
+        if (principal instanceof Merchant merchant) {
+            // API Key se aaya hai
+            return merchant.getId();
+        } else if (principal instanceof PlatformUser user) {
+            // JWT se aaya hai
+            if (user.getMerchant() == null) {
+                throw new IllegalArgumentException("Super Admin cannot initiate payments directly. Use a Merchant Account.");
+            }
+            return user.getMerchant().getId();
+        }
+        throw new IllegalArgumentException("Invalid authentication principal.");
     }
 }

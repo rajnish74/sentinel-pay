@@ -44,4 +44,7 @@ public class Merchant extends BaseEntity {
     @Column(name = "gst_number", length = 15)
     private String gstNumber;
 
+    @Column(name = "webhook_url", length = 500)
+    private String webhookUrl;
+
 }

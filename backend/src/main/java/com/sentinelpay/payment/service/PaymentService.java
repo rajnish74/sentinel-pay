@@ -10,6 +10,7 @@ import com.sentinelpay.payment.entity.Payment;
 import com.sentinelpay.payment.entity.PaymentStatus;
 import com.sentinelpay.payment.mapper.PaymentMapper;
 import com.sentinelpay.payment.repository.PaymentRepository;
+import com.sentinelpay.webhook.service.WebhookService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class PaymentService {
     private final MerchantRepository merchantRepository;
     private final PaymentMapper paymentMapper;
     private final LedgerService ledgerService;
+    private final WebhookService webhookService;
 
     @Transactional
     public PaymentResponse initiatePayment(UUID merchantId, String idempotencyKey, PaymentInitiateRequest request){
@@ -71,6 +73,8 @@ public class PaymentService {
         Payment savedPayment = paymentRepository.save(payment);
 
         ledgerService.recordPaymentCapture(savedPayment);
+
+        webhookService.sendPaymentCapturedEvent(savedPayment);
 
         return paymentMapper.toResponse(savedPayment);
     }
